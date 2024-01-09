@@ -19,12 +19,13 @@ class MemberJpaRepositoryTest {
     @Rollback(false)
     public void joinTest() throws Exception {
         // given
-        Member member1 = new Member();
-        member1.setUserName("john2");
-        member1.setUserId("john2");
+        Member member1 = Member.builder()
+                .userId("john")
+                .userName("john")
+                .build();
         // when
         String joinedMember = memberJpaRepository.join(member1);
         // then
-        Assertions.assertThat(joinedMember).isEqualTo("john2");
+        Assertions.assertThat(joinedMember).isEqualTo("john");
     }
 }
