@@ -3,10 +3,11 @@ package hjs.mall.domain;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 @Entity
-@Getter @Builder
+@Getter
+@NoArgsConstructor
 public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,5 +16,9 @@ public class Member {
 
     private String userId;
     private String userName;
-
+    @Builder
+    public Member(String userId, String userName) {
+        this.userId = userId;
+        this.userName = userName;
+    }
 }
