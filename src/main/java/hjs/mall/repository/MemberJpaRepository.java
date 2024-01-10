@@ -15,7 +15,7 @@ public class MemberJpaRepository implements MemberRepository {
 
     private final EntityManager em;
 
-    public String join(Member member) {
+    public String save(Member member) {
         em.persist(member);
         return member.getUserName();
     }

@@ -24,7 +24,7 @@ class MemberJpaRepositoryTest {
                 .userName("john")
                 .build();
         // when
-        String joinedMember = memberJpaRepository.join(member1);
+        String joinedMember = memberJpaRepository.save(member1);
         // then
         Assertions.assertThat(joinedMember).isEqualTo("john");
     }

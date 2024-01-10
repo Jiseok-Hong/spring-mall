@@ -32,7 +32,7 @@ class TeamJpaRepositoryTest {
                 .userName("john")
                 .build();
 
-        memberJpaRepository.join(member1);
+        memberJpaRepository.save(member1);
 
         Team team1 = Team.builder()
                 .name("team1")
