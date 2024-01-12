@@ -22,10 +22,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(request -> {
-                    request.requestMatchers("/register").permitAll();
-                    request.requestMatchers("/users")
-                            .hasAnyAuthority("USER", "ADMIN");
-                }).formLogin(Customizer.withDefaults()).build();
+                .formLogin(Customizer.withDefaults())
+                .build();
     }
 }

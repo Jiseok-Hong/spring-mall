@@ -15,17 +15,16 @@ public class Member {
     private String userId;
     private String userName;
     private String password;
+    private String salt;
 
     @Enumerated(EnumType.STRING)
     private Role role;
 
     @Builder
-    public Member(String userId, String userName) {
+    public Member(String userId, String userName, String password, String salt) {
         this.userId = userId;
         this.userName = userName;
-    }
-
-    public void setPasswordEncrypt(String password) {
-
+        this.password = password;
+        this.salt = salt;
     }
 }

@@ -32,12 +32,7 @@ public class MemberController {
             return ResponseEntity.badRequest().body(new ErrorDto(errors));
         }
 
-        Member newMember = Member.builder()
-                .userId(createMemberDto.getUserId())
-                .userName(createMemberDto.getUserName())
-                .build();
-
-        memberService.join(newMember);
+        memberService.join(createMemberDto);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("Member Created");
     }
