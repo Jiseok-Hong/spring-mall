@@ -2,6 +2,7 @@ package hjs.mall.controller;
 
 import hjs.mall.controller.dto.CreateMemberDto;
 import hjs.mall.controller.dto.ErrorDto;
+import hjs.mall.controller.dto.Response;
 import hjs.mall.domain.Member;
 import hjs.mall.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,6 @@ public class MemberController {
 
         memberService.join(createMemberDto);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body("Member Created");
+        return ResponseEntity.status(HttpStatus.CREATED).body(new Response("success", null, "Member Created"));
     }
 }
