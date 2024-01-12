@@ -39,6 +39,6 @@ public class MemberController {
 
         memberService.join(newMember);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(createMemberDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Member Created");
     }
 }
