@@ -5,7 +5,10 @@ import hjs.mall.domain.Member;
 import hjs.mall.exception.DuplicatedMemberIdException;
 import hjs.mall.repository.MemberJpaRepository;
 import hjs.mall.repository.MemberRepository;
+import hjs.mall.security.CustomUserDetail;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,6 +51,15 @@ public class MemberService {
     private String encryptCode(String password, String salt) {
 
         return passwordEncoder.encode(password+salt);
+    }
+
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
+        Member member = memberRepository.findByUserId(username).orElseThrow(
+                () -> new UsernameNotFoundException("Invalid authentication!")
+        );
+
+        return new CustomUserDetail(member);
     }
 
     private String getSalt() {
