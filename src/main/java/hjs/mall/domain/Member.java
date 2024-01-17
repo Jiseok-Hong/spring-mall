@@ -19,8 +19,6 @@ public class Member {
     private String userName;
     private String password;
     private String salt;
-    private String accessToken;
-    private String refreshToken;
 
     @Enumerated(EnumType.STRING)
     private Role role;
