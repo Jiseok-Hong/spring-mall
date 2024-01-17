@@ -1,4 +1,4 @@
-package hjs.mall;
+package hjs.mall.security;
 
 import hjs.mall.security.JwtAuthenticationFilter;
 import hjs.mall.security.JwtProvider;
