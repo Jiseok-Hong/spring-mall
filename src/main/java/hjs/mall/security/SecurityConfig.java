@@ -81,8 +81,22 @@ public class SecurityConfig {
                                 .authenticated()
                 )
                 // JWT 인증 필터 적용
-                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
                 // error handling
+                .exceptionHandling(handler -> handler
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.setStatus(403);
+                            response.setCharacterEncoding("utf-8");
+                            response.setContentType("text/html; charset=UTF-8");
+                            response.getWriter().write("Unauthorized");
+                        })
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(401);
+                            response.setCharacterEncoding("utf-8");
+                            response.setContentType("text/html; charset=UTF-8");
+                            response.getWriter().write("Unauthenticated");
+                        })
+                );
 
 
         return http.build();
