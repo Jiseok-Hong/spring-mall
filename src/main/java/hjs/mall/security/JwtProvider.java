@@ -1,7 +1,9 @@
 package hjs.mall.security;
 
 import hjs.mall.domain.Role;
+import hjs.mall.repository.MemberJpaRepository;
 import hjs.mall.service.MemberService;
+import hjs.mall.service.UserDetailService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -11,6 +13,7 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,6 +25,7 @@ import java.util.Date;
 
 @RequiredArgsConstructor
 @Component
+@Log4j2
 public class JwtProvider {
 
     @Value("${jwt.secret.key}")
@@ -32,7 +36,7 @@ public class JwtProvider {
     // expiry duration : 30min
     private final long exp = 1000L * 60 * 30;
 
-    private final MemberService memberService;
+    private final UserDetailService userDetailService;
 
     @PostConstruct
     protected void init() {
@@ -56,7 +60,7 @@ public class JwtProvider {
     //  Get Authorization Info
     //  Spring Security to check whether the user is authorized or not
     public Authentication getAuthentication(String token) {
-        UserDetails userDetails = memberService.loadUserByUsername(this.getAccount(token));
+        UserDetails userDetails = userDetailService.loadUserByUsername(this.getAccount(token));
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 

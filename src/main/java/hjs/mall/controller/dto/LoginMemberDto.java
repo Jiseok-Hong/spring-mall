@@ -2,21 +2,15 @@ package hjs.mall.controller.dto;
 
 import hjs.mall.domain.Role;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.List;
-
 @Data
-public class CreateMemberDto {
+public class LoginMemberDto {
+
     @NotEmpty(message = "Id is required")
     private String userId;
 
     @NotEmpty(message = "Password is required")
     private String password;
 
-    @NotEmpty(message = "User name is required")
-    private String userName;
-
-    private Role role;
 }
