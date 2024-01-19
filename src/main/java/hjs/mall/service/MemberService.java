@@ -9,14 +9,21 @@ import hjs.mall.repository.MemberJpaRepository;
 import hjs.mall.repository.MemberRepository;
 import hjs.mall.security.CustomUserDetail;
 import hjs.mall.security.JwtProvider;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.naming.AuthenticationException;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Optional;
@@ -24,11 +31,13 @@ import java.util.Optional;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Log4j2
 public class MemberService {
 
     private final MemberJpaRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+    private final UserDetailService userDetailService;
     @Transactional
     public void join(CreateMemberDto memberDto) {
 
@@ -61,7 +70,23 @@ public class MemberService {
                 .role(member.getRole())
                 .userId(member.getUserId())
                 .accessToken(jwtProvider.createAccessToken(member.getUserId(), member.getRole()))
+                .refreshToken(jwtProvider.createRefreshToken(member.getUserId(), member.getRole()))
                 .build();
+    }
+
+    public ResponseAcessToken generateAccessTokenWithRefreshToken(String refreshToken) {
+        if (refreshToken != null && jwtProvider.validateToken(refreshToken, false)) {
+            // check refresh token
+            refreshToken = refreshToken.split(" ")[1].trim();
+            CustomUserDetail userDetails = userDetailService.loadUserByUsername(jwtProvider.getAccount(refreshToken, false));
+            String newAccessToken = jwtProvider
+                    .createAccessToken(userDetails.getMember().getUserId(), userDetails.getMember().getRole());
+            Authentication auth = jwtProvider.getAuthentication(newAccessToken, true);
+            SecurityContextHolder.getContext().setAuthentication(auth);
+            return new ResponseAcessToken(newAccessToken);
+        }
+
+        throw new BadCredentialsException("Refresh Token is invalid");
     }
 
     public List<Member> findAllMember() {
@@ -96,5 +121,11 @@ public class MemberService {
         };
 
         return sb.toString();
+    }
+
+    @Data
+    @AllArgsConstructor
+    public class ResponseAcessToken {
+        private String accessToken;
     }
 }

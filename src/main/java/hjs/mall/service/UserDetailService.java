@@ -16,7 +16,7 @@ public class UserDetailService {
 
     private final MemberJpaRepository memberJpaRepository;
 
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public CustomUserDetail loadUserByUsername(String username) throws UsernameNotFoundException {
 
         Member member = memberJpaRepository.findByUserId(username).orElseThrow(
                 () -> new UsernameNotFoundException("Invalid authentication!")

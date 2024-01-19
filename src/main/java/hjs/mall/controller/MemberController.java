@@ -3,16 +3,14 @@ package hjs.mall.controller;
 import hjs.mall.controller.dto.*;
 import hjs.mall.domain.Member;
 import hjs.mall.service.MemberService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -52,8 +50,16 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(basicResponse);
     }
 
+    @PostMapping("/v1/refresh-token")
+    public ResponseEntity<?> refreshToken(@RequestHeader("Authorization") String refreshToken) {
+        MemberService.ResponseAcessToken responseAcessToken = memberService.generateAccessTokenWithRefreshToken(refreshToken);
+        BasicResponse basicResponse = new BasicResponse("success", responseAcessToken, "Access Token is created");
+        return ResponseEntity.status(HttpStatus.CREATED).body(basicResponse);
+    }
+
     @GetMapping("/v1/members")
     public ResponseEntity<?> loginMember() {
+
         List<Member> allMember = memberService.findAllMember();
         List<MemberResponseDto> list = allMember.stream().map(m -> new MemberResponseDto(m.getUserName(), m.getRole())).toList();
 

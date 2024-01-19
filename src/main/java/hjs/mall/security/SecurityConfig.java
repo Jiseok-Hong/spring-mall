@@ -80,7 +80,10 @@ public class SecurityConfig {
                 // set whitelist
                 .authorizeHttpRequests(auth ->
                         // allow user to register or login
-                        auth.requestMatchers("/v1/members/register", "/v1/members/login").permitAll()
+                        auth.requestMatchers("/v1/members/register",
+                                        "/v1/members/login",
+                                        "/v1/refresh-token")
+                                .permitAll()
                                 .anyRequest().authenticated()
                 )
                 // JWT 인증 필터 적용
@@ -98,7 +101,7 @@ public class SecurityConfig {
                                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
                                 response.setCharacterEncoding("utf-8");
                                 response.setContentType("text/html; charset=UTF-8");
-                                response.getWriter().write("Invalid username or password");
+                                response.getWriter().write(authException.getMessage());
                             } else {
                                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
                                 response.setCharacterEncoding("utf-8");

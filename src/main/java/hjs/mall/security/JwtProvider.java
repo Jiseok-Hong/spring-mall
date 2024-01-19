@@ -19,6 +19,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.time.Duration;
@@ -39,7 +40,7 @@ public class JwtProvider {
     private Key secretRefreshKey;
 
     // expiry duration : 30min
-    private final long exp = 1000L * 60 * 30;
+    private final long exp = 1000L * 60 ;
 
     private final UserDetailService userDetailService;
 
@@ -76,14 +77,19 @@ public class JwtProvider {
 
     //  Get Authorization Info
     //  Spring Security to check whether the user is authorized or not
-    public Authentication getAuthentication(String token) {
-        UserDetails userDetails = userDetailService.loadUserByUsername(this.getAccount(token));
+    public Authentication getAuthentication(String token, boolean isAccessToken) {
+        UserDetails userDetails = userDetailService.loadUserByUsername(this.getAccount(token, isAccessToken));
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
     //  get the userId From token
-    public String getAccount(String token) {
-        return Jwts.parserBuilder().setSigningKey(secretAccessKey).build().parseClaimsJws(token).getBody().getSubject();
+    public String getAccount(String token, boolean isAccessToken) {
+        return Jwts.parserBuilder()
+                .setSigningKey(isAccessToken ? secretAccessKey : secretRefreshKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
     }
 
     // Authorization Header
@@ -92,7 +98,7 @@ public class JwtProvider {
     }
 
     // Validate Token
-    public boolean validateToken(String token) {
+    public boolean validateToken(String token, boolean isAccessToken) {
         try {
             // Validate Bearer
             if (!token.substring(0, "BEARER ".length()).equalsIgnoreCase("BEARER ")) {
@@ -100,7 +106,12 @@ public class JwtProvider {
             } else {
                 token = token.split(" ")[1].trim();
             }
-            Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(secretAccessKey).build().parseClaimsJws(token);
+
+            Jws<Claims> claims = Jwts.parserBuilder()
+                    .setSigningKey(isAccessToken ? secretAccessKey : secretRefreshKey)
+                    .build()
+                    .parseClaimsJws(token);
+
             // return false when it is expired
             return !claims.getBody().getExpiration().before(new Date());
         } catch (Exception e) {
