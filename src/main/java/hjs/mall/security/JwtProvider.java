@@ -21,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.time.Duration;
 import java.util.Date;
 
 @RequiredArgsConstructor
@@ -28,10 +29,14 @@ import java.util.Date;
 @Log4j2
 public class JwtProvider {
 
-    @Value("${jwt.secret.key}")
-    private String salt;
+    @Value("${jwt.secret.accessKey}")
+    private String access_salt;
 
-    private Key secretKey;
+    @Value("${jwt.secret.refreshKey}")
+    private String refresh_salt;
+
+    private Key secretAccessKey;
+    private Key secretRefreshKey;
 
     // expiry duration : 30min
     private final long exp = 1000L * 60 * 30;
@@ -40,8 +45,8 @@ public class JwtProvider {
 
     @PostConstruct
     protected void init() {
-        byte[] keyBytes = Decoders.BASE64.decode(salt);
-        secretKey = Keys.hmacShaKeyFor(keyBytes);
+        secretAccessKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(access_salt));
+        secretRefreshKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(refresh_salt));
     }
 
     // Create AccessToken
@@ -53,7 +58,19 @@ public class JwtProvider {
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + exp))
-                .signWith(secretKey, SignatureAlgorithm.HS256)
+                .signWith(secretAccessKey, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String createRefreshToken(String userId, Role role) {
+        Claims claims = Jwts.claims().setSubject(userId);
+        claims.put("role", role);
+        Date now = new Date();
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + Duration.ofDays(30).toMillis()))
+                .signWith(secretRefreshKey, SignatureAlgorithm.HS256)
                 .compact();
     }
 
@@ -66,7 +83,7 @@ public class JwtProvider {
 
     //  get the userId From token
     public String getAccount(String token) {
-        return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody().getSubject();
+        return Jwts.parserBuilder().setSigningKey(secretAccessKey).build().parseClaimsJws(token).getBody().getSubject();
     }
 
     // Authorization Header
@@ -83,7 +100,7 @@ public class JwtProvider {
             } else {
                 token = token.split(" ")[1].trim();
             }
-            Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
+            Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(secretAccessKey).build().parseClaimsJws(token);
             // return false when it is expired
             return !claims.getBody().getExpiration().before(new Date());
         } catch (Exception e) {
