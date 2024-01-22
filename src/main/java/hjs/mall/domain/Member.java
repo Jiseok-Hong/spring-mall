@@ -19,10 +19,13 @@ public class Member {
     private String userName;
     private String password;
     private String salt;
+    private String refreshToken;
 
     @Enumerated(EnumType.STRING)
     private Role role;
 
-
+    public void changeRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
 
 }

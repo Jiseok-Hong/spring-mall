@@ -57,23 +57,31 @@ public class MemberService {
         memberRepository.save(member);
     }
 
+    @Transactional
     public LoginMemberResponse login(LoginMemberDto loginMemberDto){
         Member member = memberRepository.findByUserId(loginMemberDto.getUserId())
                 .orElseThrow(() -> new BadCredentialsException("The User id is not existed"));
+
 
         String rawPassword = loginMemberDto.getPassword() + member.getSalt();
         if (!passwordEncoder.matches(rawPassword, member.getPassword())) {
             throw new BadCredentialsException("The password is wrong");
         }
 
+        //password is correct and the user is authenticated
+        String refreshToken = jwtProvider.createRefreshToken(member.getUserId(), member.getRole());
+
+        member.changeRefreshToken(refreshToken);
+
         return LoginMemberResponse.builder()
                 .role(member.getRole())
                 .userId(member.getUserId())
                 .accessToken(jwtProvider.createAccessToken(member.getUserId(), member.getRole()))
-                .refreshToken(jwtProvider.createRefreshToken(member.getUserId(), member.getRole()))
+                .refreshToken(refreshToken)
                 .build();
     }
 
+    @Transactional
     public ResponseAcessToken generateAccessTokenWithRefreshToken(String refreshToken) {
         if (refreshToken != null && jwtProvider.validateToken(refreshToken, false)) {
             // check refresh token
