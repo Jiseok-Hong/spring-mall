@@ -38,6 +38,7 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
     private final UserDetailService userDetailService;
+
     @Transactional
     public void join(CreateMemberDto memberDto) {
 
@@ -58,7 +59,7 @@ public class MemberService {
     }
 
     @Transactional
-    public LoginMemberResponse login(LoginMemberDto loginMemberDto){
+    public LoginMemberResponse login(LoginMemberDto loginMemberDto) {
         Member member = memberRepository.findByUserId(loginMemberDto.getUserId())
                 .orElseThrow(() -> new BadCredentialsException("The User id is not existed"));
 
@@ -82,16 +83,28 @@ public class MemberService {
     }
 
     @Transactional
-    public ResponseAcessToken generateAccessTokenWithRefreshToken(String refreshToken) {
+    public ResponseAuthToken generateAccessTokenWithRefreshToken(String refreshToken) {
         if (refreshToken != null && jwtProvider.validateToken(refreshToken, false)) {
-            // check refresh token
+            // check refresh token and when it is valid
             refreshToken = refreshToken.split(" ")[1].trim();
-            CustomUserDetail userDetails = userDetailService.loadUserByUsername(jwtProvider.getAccount(refreshToken, false));
+            CustomUserDetail userDetails = userDetailService
+                    .loadUserByUsername(jwtProvider.getAccount(refreshToken, false));
+
+            Member currentMember = userDetails.getMember();
+
+            if (!currentMember.getRefreshToken().equals(refreshToken)) {
+                throw new BadCredentialsException("Refresh Token is invalid");
+            }
+
+            String newRefreshToken = jwtProvider.createRefreshToken(currentMember.getUserId(), currentMember.getRole());
             String newAccessToken = jwtProvider
                     .createAccessToken(userDetails.getMember().getUserId(), userDetails.getMember().getRole());
+
+            currentMember.changeRefreshToken(newRefreshToken);
             Authentication auth = jwtProvider.getAuthentication(newAccessToken, true);
             SecurityContextHolder.getContext().setAuthentication(auth);
-            return new ResponseAcessToken(newAccessToken);
+
+            return new ResponseAuthToken(newAccessToken, newRefreshToken);
         }
 
         throw new BadCredentialsException("Refresh Token is invalid");
@@ -110,13 +123,13 @@ public class MemberService {
 
     private String encryptCode(String password, String salt) {
 
-        return passwordEncoder.encode(password+salt);
+        return passwordEncoder.encode(password + salt);
     }
 
     private String getSalt() {
 
         //1. Random, byte object generation
-        SecureRandom r = new SecureRandom ();
+        SecureRandom r = new SecureRandom();
         byte[] salt = new byte[20];
 
         //2. generate random number
@@ -124,16 +137,18 @@ public class MemberService {
 
         //3. byte To String
         StringBuffer sb = new StringBuffer();
-        for(byte b : salt) {
+        for (byte b : salt) {
             sb.append(String.format("%02x", b));
-        };
+        }
+        ;
 
         return sb.toString();
     }
 
     @Data
     @AllArgsConstructor
-    public class ResponseAcessToken {
+    public class ResponseAuthToken {
         private String accessToken;
+        private String refreshToken;
     }
 }

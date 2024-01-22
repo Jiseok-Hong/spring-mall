@@ -40,7 +40,7 @@ public class JwtProvider {
     private Key secretRefreshKey;
 
     // expiry duration : 30min
-    private final long exp = 1000L * 60 ;
+    private final long exp = 1000L * 60 * 30;
 
     private final UserDetailService userDetailService;
 

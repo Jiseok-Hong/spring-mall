@@ -52,7 +52,7 @@ public class MemberController {
 
     @PostMapping("/v1/refresh-token")
     public ResponseEntity<?> refreshToken(@RequestHeader("Authorization") String refreshToken) {
-        MemberService.ResponseAcessToken responseAcessToken = memberService.generateAccessTokenWithRefreshToken(refreshToken);
+        MemberService.ResponseAuthToken responseAcessToken = memberService.generateAccessTokenWithRefreshToken(refreshToken);
         BasicResponse basicResponse = new BasicResponse("success", responseAcessToken, "Access Token is created");
         return ResponseEntity.status(HttpStatus.CREATED).body(basicResponse);
     }
