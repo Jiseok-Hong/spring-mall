@@ -3,6 +3,7 @@ package hjs.mall.service;
 import hjs.mall.controller.dto.CreateMemberDto;
 import hjs.mall.controller.dto.LoginMemberDto;
 import hjs.mall.controller.dto.LoginMemberResponse;
+import hjs.mall.domain.Basket;
 import hjs.mall.domain.Member;
 import hjs.mall.exception.DuplicatedMemberIdException;
 import hjs.mall.repository.MemberJpaRepository;
@@ -54,6 +55,8 @@ public class MemberService {
                 .salt(salt)
                 .role(memberDto.getRole())
                 .build();
+
+        member.setInitialBasket(new Basket());
 
         memberRepository.save(member);
     }
