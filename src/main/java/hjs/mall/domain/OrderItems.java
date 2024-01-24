@@ -24,7 +24,18 @@ public class OrderItems {
     @JoinColumn(name = "order_id")
     private Order order;
 
-    private int quantity;
-    private String name;
-    private int price;
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "order_item_id")
+    private Item item;
+
+    private int count;
+    private int orderPrice;
+
+    public void cancelOrder() {
+        getItem().addStock(count);
+    }
+
+    public int getTotalPrice() {
+        return count * orderPrice;
+    }
 }
