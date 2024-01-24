@@ -25,8 +25,12 @@ public class OrderItems {
     private Order order;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "order_item_id")
+    @JoinColumn(name = "item_id")
     private Item item;
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "basket_id")
+    private Basket basket;
 
     private int count;
     private int orderPrice;

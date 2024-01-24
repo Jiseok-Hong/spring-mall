@@ -9,15 +9,17 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
+import static jakarta.persistence.FetchType.*;
+
 @Entity
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Member {
+public class Member extends BaseTimeEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "order_id")
+    @Column(name = "member_id")
     private Long id;
     private String userId;
     private String userName;
@@ -30,6 +32,10 @@ public class Member {
 
     @OneToMany(mappedBy = "member")
     private List<Order> orders = new ArrayList<>();
+
+    @OneToOne(fetch = LAZY)
+    @JoinColumn(name = "basket_id")
+    private Basket basket;
 
     public void changeRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
