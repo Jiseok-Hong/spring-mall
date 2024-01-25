@@ -106,7 +106,6 @@ public class JwtProvider {
             } else {
                 token = token.split(" ")[1].trim();
             }
-
             Jws<Claims> claims = Jwts.parserBuilder()
                     .setSigningKey(isAccessToken ? secretAccessKey : secretRefreshKey)
                     .build()
