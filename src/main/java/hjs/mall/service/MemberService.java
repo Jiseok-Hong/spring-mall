@@ -92,7 +92,6 @@ public class MemberService {
             refreshToken = refreshToken.split(" ")[1].trim();
             CustomUserDetail userDetails = userDetailService
                     .loadUserByUsername(jwtProvider.getAccount(refreshToken, false));
-
             Member currentMember = userDetails.getMember();
 
             if (!currentMember.getRefreshToken().equals(refreshToken)) {
