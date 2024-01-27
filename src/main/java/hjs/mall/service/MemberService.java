@@ -94,6 +94,9 @@ public class MemberService {
                     .loadUserByUsername(jwtProvider.getAccount(refreshToken, false));
             Member currentMember = userDetails.getMember();
 
+            System.out.println("current refresh : " + currentMember.getRefreshToken());
+            System.out.println("parameter refresh : " + refreshToken);
+
             if (!currentMember.getRefreshToken().equals(refreshToken)) {
                 throw new BadCredentialsException("Refresh Token is invalid");
             }
@@ -103,6 +106,7 @@ public class MemberService {
                     .createAccessToken(userDetails.getMember().getUserId(), userDetails.getMember().getRole());
 
             currentMember.changeRefreshToken(newRefreshToken);
+
             Authentication auth = jwtProvider.getAuthentication(newAccessToken, true);
             SecurityContextHolder.getContext().setAuthentication(auth);
 

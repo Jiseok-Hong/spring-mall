@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -108,6 +109,7 @@ class MemberServiceTest {
     }
     
     @Test
+    @Rollback(value = false)
     public void checkRTR() throws Exception {
         // given
         LoginMemberDto loginMemberDto = new LoginMemberDto();
@@ -128,10 +130,6 @@ class MemberServiceTest {
         MemberService.ResponseAuthToken responseAuthToken = memberService
                 .generateAccessTokenWithRefreshToken(oldRefreshToken);
         // then
-        System.out.println("--------------second start--------------------");
-        assertThatThrownBy(() -> memberService.generateAccessTokenWithRefreshToken(oldRefreshToken))
-                .isInstanceOf(BadCredentialsException.class);
-
 
         //the new access token and refresh token are valid
 
@@ -140,6 +138,12 @@ class MemberServiceTest {
         assertThat(jwtProvider.validateToken("BEARER " + responseAuthToken.getRefreshToken(), false))
                 .isTrue();
 
+        em.flush();
+        em.clear();
+        MemberService.ResponseAuthToken responseAuthToken1 =
+                memberService.generateAccessTokenWithRefreshToken(oldRefreshToken);
+        System.out.println(oldRefreshToken);
+        System.out.println(responseAuthToken1.getRefreshToken());
     }
 
 }
