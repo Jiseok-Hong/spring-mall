@@ -45,4 +45,10 @@ public class MemberJpaRepository implements MemberRepository {
         return em.createQuery("select m from Member m", Member.class).getResultList();
     }
 
+    public List<Member> findAllWithBasket() {
+        return em.createQuery("select m from Member m" +
+                        " join fetch m.basket b", Member.class)
+                .getResultList();
+    }
+
 }

@@ -114,7 +114,7 @@ public class MemberService {
     }
 
     public List<Member> findAllMember() {
-        return memberRepository.findAll();
+        return memberRepository.findAllWithBasket();
     }
 
     private void checkDuplicatedMemberId(String memberUserId) {

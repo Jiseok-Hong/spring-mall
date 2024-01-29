@@ -61,9 +61,15 @@ public class MemberController {
     public ResponseEntity<?> loginMember() {
 
         List<Member> allMember = memberService.findAllMember();
-        List<MemberResponseDto> list = allMember.stream().map(m -> new MemberResponseDto(m.getUserName(), m.getRole())).toList();
+        List<MemberResponseDto> list = allMember.stream()
+                .map(m -> new MemberResponseDto(m.getUserName(),
+                        m.getRole(),
+                        m.getBasket().getId()))
+                .toList();
 
         BasicResponse basicResponse = new BasicResponse("success", list, "");
         return ResponseEntity.status(HttpStatus.OK).body(basicResponse);
     }
+
+
 }
