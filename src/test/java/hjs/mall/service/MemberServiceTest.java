@@ -34,8 +34,6 @@ class MemberServiceTest {
     MemberJpaRepository memberRepository;
     @Autowired
     JwtProvider jwtProvider;
-    @Autowired
-    EntityManager em;
 
     @BeforeEach
     public void createInitialMember() {
@@ -109,7 +107,6 @@ class MemberServiceTest {
     }
     
     @Test
-    @Rollback(value = false)
     public void checkRTR() throws Exception {
         // given
         LoginMemberDto loginMemberDto = new LoginMemberDto();
@@ -127,10 +124,11 @@ class MemberServiceTest {
         assertThat(jwtProvider.validateToken(oldRefreshToken, false))
                 .isTrue();
 
+        Thread.sleep(1000);
+
         MemberService.ResponseAuthToken responseAuthToken = memberService
                 .generateAccessTokenWithRefreshToken(oldRefreshToken);
         // then
-
         //the new access token and refresh token are valid
 
         assertThat(jwtProvider.validateToken("BEARER " + responseAuthToken.getAccessToken(), true))
@@ -138,12 +136,9 @@ class MemberServiceTest {
         assertThat(jwtProvider.validateToken("BEARER " + responseAuthToken.getRefreshToken(), false))
                 .isTrue();
 
-        em.flush();
-        em.clear();
-        MemberService.ResponseAuthToken responseAuthToken1 =
-                memberService.generateAccessTokenWithRefreshToken(oldRefreshToken);
-        System.out.println(oldRefreshToken);
-        System.out.println(responseAuthToken1.getRefreshToken());
+        assertThatThrownBy(() -> memberService.generateAccessTokenWithRefreshToken(oldRefreshToken))
+                .isInstanceOf(BadCredentialsException.class);
+
     }
 
 }
