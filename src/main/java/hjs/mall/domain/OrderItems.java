@@ -42,4 +42,8 @@ public class OrderItems {
     public int getTotalPrice() {
         return count * orderPrice;
     }
+
+    public void setOrders(Orders orders) {
+        this.orders = orders;
+    }
 }

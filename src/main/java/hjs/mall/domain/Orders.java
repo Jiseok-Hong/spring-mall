@@ -2,10 +2,7 @@ package hjs.mall.domain;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -29,7 +26,8 @@ public class Orders {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToMany(mappedBy = "orders")
+    @Builder.Default
+    @OneToMany(mappedBy = "orders", cascade = CascadeType.ALL)
     private List<OrderItems> orderItems = new ArrayList<>();
 
     @Embedded
@@ -41,9 +39,13 @@ public class Orders {
     private LocalDateTime orderDate;
 
     public void setMember(Member member) {
-                member.getOrders().add(this);
+        member.getOrders().add(this);
         this.member = member;
     }
 
+    public void setOrderItems(OrderItems orderItem) {
+        this.orderItems.add(orderItem);
+        orderItem.setOrders(this);
+    }
 
 }
