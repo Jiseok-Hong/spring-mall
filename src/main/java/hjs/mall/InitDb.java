@@ -74,6 +74,7 @@ public class InitDb {
                     .setParameter("userName", "john")
                     .getSingleResult();
 
+
             Orders orders = Orders.builder()
                     .address(new Address("Hong Kong", "Hong Kong", "123"))
                     .orderDate(LocalDateTime.now())

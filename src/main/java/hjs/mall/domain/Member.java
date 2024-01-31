@@ -1,10 +1,8 @@
 package hjs.mall.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +13,7 @@ import static jakarta.persistence.FetchType.*;
 @Entity
 @Getter
 @Builder
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class Member extends BaseTimeEntity{
     @Id
@@ -36,6 +34,7 @@ public class Member extends BaseTimeEntity{
     private Basket basket;
 
     @OneToMany(mappedBy = "member")
+    @JsonIgnore
     private List<Orders> orders = new ArrayList<>();
 
     public void changeRefreshToken(String refreshToken) {

@@ -62,7 +62,7 @@ public class SecurityConfig {
                 // CORS Configuration
                 .cors(c -> {
                             CorsConfigurationSource source = request -> {
-                                // Cors 허용 패턴
+                                // Cors Acceptable Pattern
                                 CorsConfiguration config = new CorsConfiguration();
                                 config.setAllowedOrigins(
                                         List.of("*")

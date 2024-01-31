@@ -23,8 +23,10 @@ public class OrderRepository {
     }
 
     public List<Orders> findAll(Long member_id) {
-        return em.createQuery("select o from Orders o where o.member = :member_id", Orders.class)
-                .setParameter("member_id", member_id)
+        List<Orders> memberId = em.createQuery("select o from Orders o"
+                        , Orders.class)
                 .getResultList();
+        System.out.println(memberId);
+        return memberId;
     }
 }
