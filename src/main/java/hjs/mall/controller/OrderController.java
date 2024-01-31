@@ -27,4 +27,9 @@ public class OrderController {
                 .map(o -> new OrderResponseDto())
                 .collect(Collectors.toList());
     }
+
+//    @GetMapping("/v1/orders/items")
+//    public List<OrderResponseDto> getAllOrdersWithItems(@RequestBody Long member_id) {
+//
+//    }
 }

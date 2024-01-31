@@ -2,6 +2,7 @@ package hjs.mall;
 
 import hjs.mall.controller.dto.CreateMemberDto;
 import hjs.mall.domain.*;
+import hjs.mall.service.MemberService;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -30,19 +31,17 @@ public class InitDb {
     @RequiredArgsConstructor
     static class InitService {
         private final EntityManager em;
-
+        private final MemberService memberService;
         public void dbInit1() {
-            Basket basket = new Basket();
 
-            Member member = Member.builder()
-                    .role(Role.ADMIN)
-                    .userId("john")
-                    .password("1234")
-                    .userName("john")
-                    .build();
+            CreateMemberDto createMemberDto = new CreateMemberDto();
+            createMemberDto.setUserName("john");
+            createMemberDto.setPassword("1234");
+            createMemberDto.setUserId("john");
+            createMemberDto.setRole(Role.ADMIN);
 
-            member.setInitialBasket(basket);
-            em.persist(member);
+            memberService.join(createMemberDto);
+
             Item item1 = Item.builder()
                     .name("iphone")
                     .price(100)
@@ -69,11 +68,17 @@ public class InitDb {
                     .orderPrice(200)
                     .build();
 
+            Member singleResult = em.createQuery("select m from Member m" +
+                                    " where m.userName = :userName"
+                            , Member.class)
+                    .setParameter("userName", "john")
+                    .getSingleResult();
+
             Orders orders = Orders.builder()
                     .address(new Address("Hong Kong", "Hong Kong", "123"))
                     .orderDate(LocalDateTime.now())
                     .orderStatus(OrderStatus.PENDING)
-                    .member(member)
+                    .member(singleResult)
                     .build();
 
             orders.setOrderItems(orderItems1);
