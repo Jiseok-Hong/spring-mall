@@ -1,6 +1,9 @@
 package hjs.mall.controller;
 
+import hjs.mall.controller.dto.BasicResponse;
+import hjs.mall.controller.dto.OrderItemsResponseDto;
 import hjs.mall.controller.dto.OrderResponseDto;
+import hjs.mall.domain.Orders;
 import hjs.mall.repository.OrderRepository;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -26,13 +29,19 @@ public class OrderController {
                 .map(OrderResponseDto::new)
                 .collect(Collectors.toList());
 
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(collect);
+        BasicResponse basicResponse = new BasicResponse("success", collect, "");
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(basicResponse);
     }
 
-//    @GetMapping("/v1/orders/items")
-//    public List<OrderResponseDto> getAllOrdersWithItems(@RequestBody Long member_id) {
-//
-//    }
+    @GetMapping("/v1/orders/items")
+    public ResponseEntity<?> getAllOrdersWithItems(@RequestBody(required = false) MemberRequest memberRequest) {
+        List<OrderItemsResponseDto> collect = orderRepository.findAllWithItems(memberRequest.member_id)
+                .stream()
+                .map(OrderItemsResponseDto::new)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(collect);
+    }
 
     @Data
     static class MemberRequest {

@@ -23,11 +23,20 @@ public class OrderRepository {
     }
 
     public List<Orders> findAll(String member_id) {
-        List<Orders> memberId = em.createQuery("select o from Orders o" +
+        return em.createQuery("select o from Orders o" +
                         " where o.member.id = :member_id", Orders.class)
                 .setParameter("member_id", member_id)
                 .getResultList();
-        System.out.println(memberId);
-        return memberId;
+    }
+
+    public List<Orders> findAllWithItems(String member_id) {
+        return em.createQuery("select o from Orders o" +
+                " join fetch o.member m" +
+                " join fetch o.orderItems oi" +
+                " join fetch oi.item i" +
+                " where o.member.id = :member_id", Orders.class)
+                .setParameter("member_id", member_id)
+                .getResultList();
+
     }
 }
