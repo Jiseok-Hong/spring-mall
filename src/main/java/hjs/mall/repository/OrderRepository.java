@@ -11,7 +11,7 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 public class OrderRepository {
-    private EntityManager em;
+    private final EntityManager em;
 
     public void save(Orders order) {
         em.persist(order);
@@ -22,9 +22,10 @@ public class OrderRepository {
         return Optional.of(order);
     }
 
-    public List<Orders> findAll(Long member_id) {
-        List<Orders> memberId = em.createQuery("select o from Orders o"
-                        , Orders.class)
+    public List<Orders> findAll(String member_id) {
+        List<Orders> memberId = em.createQuery("select o from Orders o" +
+                        " where o.member.id = :member_id", Orders.class)
+                .setParameter("member_id", member_id)
                 .getResultList();
         System.out.println(memberId);
         return memberId;
