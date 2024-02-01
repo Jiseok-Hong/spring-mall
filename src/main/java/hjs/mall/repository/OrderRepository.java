@@ -37,6 +37,5 @@ public class OrderRepository {
                 " where o.member.id = :member_id", Orders.class)
                 .setParameter("member_id", member_id)
                 .getResultList();
-
     }
 }
