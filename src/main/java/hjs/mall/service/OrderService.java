@@ -1,33 +1,44 @@
 package hjs.mall.service;
 
-import hjs.mall.domain.Basket;
-import hjs.mall.domain.Item;
-import hjs.mall.domain.Member;
-import hjs.mall.domain.OrderItems;
-import hjs.mall.repository.BasketRepository;
-import hjs.mall.repository.ItemRepository;
-import hjs.mall.repository.MemberJpaRepository;
-import hjs.mall.repository.OrderItemsRepository;
+import hjs.mall.domain.*;
+import hjs.mall.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class OrderService {
-    private final ItemRepository itemRepository;
-    private final MemberJpaRepository memberJpaRepository;
+
     private final OrderItemsRepository orderItemsRepository;
-    public void addItemsToBasket(Long member_id, Long item_id, int count, int orderPrice) {
-        Member basketOwner = memberJpaRepository.findById(member_id);
-        Basket basket = basketOwner.getBasket();
+    private final OrderRepository orderRepository;
+    public void createOrderWithItems(Member member, Address address, OrderItems ...orderItems) {
+        Orders order = Orders.builder()
+                .member(member)
+                .address(address)
+                .orderStatus(OrderStatus.PENDING)
+                .orderDate(LocalDateTime.now())
+                .build();
+        for (OrderItems orderItem : orderItems) {
+            order.setOrderItems(orderItem);
+        }
 
-        Item itemIsNotExisted = itemRepository.findById(item_id).orElseThrow(() -> new IllegalStateException("item is not existed"));
+        orderRepository.save(order);
 
-        Optional<OrderItems> byBasketAndItem = orderItemsRepository.findByBasketAndItem(basket.getId(), itemIsNotExisted.getId());
+    }
+
+    public void addItemsToBasket(Member member, Optional<Item> item, int count, int orderPrice) {
+        Basket basket = member.getBasket();
+
+        if (item.isEmpty()) {
+            throw new IllegalStateException("item is not existed");
+        }
+
+        Optional<OrderItems> byBasketAndItem = orderItemsRepository.findByBasketAndItem(basket.getId(), item.get().getId());
 
         if (byBasketAndItem.isPresent()) {
             System.out.println(byBasketAndItem.get().getCount());
@@ -36,7 +47,7 @@ public class OrderService {
         }
 
         OrderItems orderItems = OrderItems.builder()
-                .item(itemIsNotExisted)
+                .item(item.get())
                 .count(count)
                 .orderPrice(orderPrice)
                 .build();

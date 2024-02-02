@@ -3,7 +3,12 @@ package hjs.mall.controller;
 import hjs.mall.controller.dto.BasicResponse;
 import hjs.mall.controller.dto.OrderItemsResponseDto;
 import hjs.mall.controller.dto.OrderResponseDto;
+import hjs.mall.domain.Address;
+import hjs.mall.domain.Member;
 import hjs.mall.domain.Orders;
+import hjs.mall.repository.ItemRepository;
+import hjs.mall.repository.MemberJpaRepository;
+import hjs.mall.repository.OrderItemsRepository;
 import hjs.mall.repository.OrderRepository;
 import hjs.mall.service.OrderService;
 import lombok.Data;
@@ -26,6 +31,9 @@ public class OrderController {
 
     private final OrderRepository orderRepository;
     private final OrderService orderService;
+    private final MemberJpaRepository memberJpaRepository;
+    private final ItemRepository itemRepository;
+
     @GetMapping("/v1/orders")
     public ResponseEntity<?> getAllOrders(@RequestBody(required = false) MemberRequest memberRequest) {
         List<OrderResponseDto> collect = orderRepository.findAll(memberRequest.member_id).stream()
@@ -34,6 +42,12 @@ public class OrderController {
 
         BasicResponse basicResponse = new BasicResponse("success", collect, "");
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(basicResponse);
+    }
+
+    @PostMapping("/v1/orders")
+    public ResponseEntity<?> createOrder(@RequestBody OrderCreateRequest orderCreateRequest) {
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
     }
 
     @GetMapping("/v1/orders/items")
@@ -49,8 +63,9 @@ public class OrderController {
     @PostMapping("/v1/orders/add-basket")
     public ResponseEntity<?> addOrderItemToBasket(@RequestBody(required = false) BasketAddRequest basketAddRequest) {
 
-        orderService.addItemsToBasket(basketAddRequest.memberId,
-                basketAddRequest.itemId,
+        orderService.addItemsToBasket(
+                memberJpaRepository.findById(basketAddRequest.memberId),
+                itemRepository.findById(basketAddRequest.itemId),
                 basketAddRequest.count,
                 basketAddRequest.orderPrice);
 
@@ -61,6 +76,13 @@ public class OrderController {
     @Data
     static class MemberRequest {
         private String member_id;
+    }
+
+    @Data
+    static class OrderCreateRequest {
+        Long member_id;
+        Address address;
+        List<Long> items;
     }
 
     @Data
