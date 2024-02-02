@@ -13,7 +13,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ItemRepository {
 
-    private EntityManager em;
+    private final EntityManager em;
 
     public void save(Item item) {
         em.persist(item);

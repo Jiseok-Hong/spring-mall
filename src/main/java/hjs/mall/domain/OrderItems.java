@@ -46,4 +46,13 @@ public class OrderItems {
     public void setOrders(Orders orders) {
         this.orders = orders;
     }
+
+    public void addBasket(Basket basket) {
+        this.basket = basket;
+        basket.getOrderItems().add(this);
+    }
+
+    public void addCount(int count) {
+        this.count += count;
+    }
 }

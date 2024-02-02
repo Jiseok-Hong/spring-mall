@@ -45,14 +45,14 @@ public class InitDb {
             Item item1 = Item.builder()
                     .name("iphone")
                     .price(100)
-                    .stockQuantity(100)
+                    .stockQuantity(1000)
                     .build();
             em.persist(item1);
 
             Item item2 = Item.builder()
                     .name("galaxy")
                     .price(200)
-                    .stockQuantity(100)
+                    .stockQuantity(1000)
                     .build();
             em.persist(item2);
 
@@ -83,7 +83,9 @@ public class InitDb {
                     .build();
 
             orders.setOrderItems(orderItems1);
+            orderItems1.getItem().removeStock(orderItems1.getCount());
             orders.setOrderItems(orderItems2);
+            orderItems2.getItem().removeStock(orderItems2.getCount());
 
             em.persist(orders);
         }

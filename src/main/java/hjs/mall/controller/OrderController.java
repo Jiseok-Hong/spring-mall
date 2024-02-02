@@ -5,12 +5,14 @@ import hjs.mall.controller.dto.OrderItemsResponseDto;
 import hjs.mall.controller.dto.OrderResponseDto;
 import hjs.mall.domain.Orders;
 import hjs.mall.repository.OrderRepository;
+import hjs.mall.service.OrderService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,6 +25,7 @@ import java.util.stream.Collectors;
 public class OrderController {
 
     private final OrderRepository orderRepository;
+    private final OrderService orderService;
     @GetMapping("/v1/orders")
     public ResponseEntity<?> getAllOrders(@RequestBody(required = false) MemberRequest memberRequest) {
         List<OrderResponseDto> collect = orderRepository.findAll(memberRequest.member_id).stream()
@@ -43,8 +46,28 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(collect);
     }
 
+    @PostMapping("/v1/orders/add-basket")
+    public ResponseEntity<?> addOrderItemToBasket(@RequestBody(required = false) BasketAddRequest basketAddRequest) {
+
+        orderService.addItemsToBasket(basketAddRequest.memberId,
+                basketAddRequest.itemId,
+                basketAddRequest.count,
+                basketAddRequest.orderPrice);
+
+        BasicResponse basicResponse = new BasicResponse("success", null, "Items added to basket");
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(basicResponse);
+    }
+
     @Data
     static class MemberRequest {
         private String member_id;
+    }
+
+    @Data
+    static class BasketAddRequest {
+        private Long memberId;
+        private Long itemId;
+        private int count;
+        private int orderPrice;
     }
 }

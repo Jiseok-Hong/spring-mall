@@ -29,4 +29,5 @@ public class Basket {
     public void setMember(Member member) {
         this.member = member;
     }
+
 }
