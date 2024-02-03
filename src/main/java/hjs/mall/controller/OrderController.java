@@ -69,8 +69,13 @@ public class OrderController {
                 basketAddRequest.count,
                 basketAddRequest.orderPrice);
 
-        BasicResponse basicResponse = new BasicResponse("success", null, "Items added to basket");
+        BasicResponse basicResponse = getBasicResponse(null);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(basicResponse);
+    }
+
+    private static BasicResponse getBasicResponse(Object data) {
+        BasicResponse basicResponse = new BasicResponse("success", data, "Items added to basket");
+        return basicResponse;
     }
 
     @Data
