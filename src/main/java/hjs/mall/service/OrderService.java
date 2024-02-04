@@ -28,6 +28,11 @@ public class OrderService {
                 .orderDate(LocalDateTime.now())
                 .build();
 
+        for (OrderItems orderItem : orderItemDtoList) {
+            order.setOrderItems(orderItem);
+            orderItem.getItem().removeStock(orderItem.getCount());
+        }
+
         orderRepository.save(order);
     }
 

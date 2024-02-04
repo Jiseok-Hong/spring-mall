@@ -47,7 +47,7 @@ public class OrderController {
     @PostMapping("/v1/orders")
     public ResponseEntity<?> createOrder(@RequestBody OrderCreateRequest orderCreateRequest) {
 
-        List<OrderItems> collect = orderCreateRequest.getOrderItemDtos().stream().map(oi -> {
+        List<OrderItems> collect = orderCreateRequest.getOrderItem().stream().map(oi -> {
             Optional<Item> byId = itemRepository.findById(oi.getItem_id());
             return byId.map(item -> OrderItems.builder()
                     .item(item)
@@ -56,12 +56,13 @@ public class OrderController {
                     .build()).orElse(null);
         }).toList();
 
-        orderService
-                .createOrderWithItems(memberJpaRepository.findById(orderCreateRequest.member_id)
-                        , orderCreateRequest.address
-                        , collect);
+        orderService.createOrderWithItems(
+                        memberJpaRepository.findById(orderCreateRequest.member_id),
+                        orderCreateRequest.address,
+                        collect);
 
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
+        BasicResponse basicResponse = new BasicResponse("success", null, "Order Created");
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(basicResponse);
     }
 
     @GetMapping("/v1/orders/items")
@@ -96,7 +97,7 @@ public class OrderController {
     static class OrderCreateRequest {
         Long member_id;
         Address address;
-        List<OrderItemDto> orderItemDtos;
+        List<OrderItemDto> orderItem;
     }
 
     @Data
