@@ -1,11 +1,10 @@
 package hjs.mall.controller;
 
 import hjs.mall.controller.dto.BasicResponse;
+import hjs.mall.controller.dto.OrderItemDto;
 import hjs.mall.controller.dto.OrderItemsResponseDto;
 import hjs.mall.controller.dto.OrderResponseDto;
-import hjs.mall.domain.Address;
-import hjs.mall.domain.Member;
-import hjs.mall.domain.Orders;
+import hjs.mall.domain.*;
 import hjs.mall.repository.ItemRepository;
 import hjs.mall.repository.MemberJpaRepository;
 import hjs.mall.repository.OrderItemsRepository;
@@ -22,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -47,6 +47,20 @@ public class OrderController {
     @PostMapping("/v1/orders")
     public ResponseEntity<?> createOrder(@RequestBody OrderCreateRequest orderCreateRequest) {
 
+        List<OrderItems> collect = orderCreateRequest.getOrderItemDtos().stream().map(oi -> {
+            Optional<Item> byId = itemRepository.findById(oi.getItem_id());
+            return byId.map(item -> OrderItems.builder()
+                    .item(item)
+                    .orderPrice(oi.getOrderPrice())
+                    .count(oi.getCount())
+                    .build()).orElse(null);
+        }).toList();
+
+        orderService
+                .createOrderWithItems(memberJpaRepository.findById(orderCreateRequest.member_id)
+                        , orderCreateRequest.address
+                        , collect);
+
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(null);
     }
 
@@ -69,13 +83,8 @@ public class OrderController {
                 basketAddRequest.count,
                 basketAddRequest.orderPrice);
 
-        BasicResponse basicResponse = getBasicResponse(null);
+        BasicResponse basicResponse = new BasicResponse("success", null, "Items added to basket");
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(basicResponse);
-    }
-
-    private static BasicResponse getBasicResponse(Object data) {
-        BasicResponse basicResponse = new BasicResponse("success", data, "Items added to basket");
-        return basicResponse;
     }
 
     @Data
@@ -87,7 +96,7 @@ public class OrderController {
     static class OrderCreateRequest {
         Long member_id;
         Address address;
-        List<Long> items;
+        List<OrderItemDto> orderItemDtos;
     }
 
     @Data
