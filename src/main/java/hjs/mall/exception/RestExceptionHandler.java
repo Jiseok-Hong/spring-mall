@@ -20,6 +20,13 @@ public class RestExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
+    @ExceptionHandler(NotEnoughStockException.class)
+    public ResponseEntity<ErrorResponse> notEnoughStockException(NotEnoughStockException ex) {
+        String errorMessage = ex.getMessage();
+        ErrorResponse errorResponse = new ErrorResponse(errorMessage);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
     @Getter
     @Setter
     @NoArgsConstructor
