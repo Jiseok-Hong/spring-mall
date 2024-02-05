@@ -1,20 +1,24 @@
 package hjs.mall.controller;
 
-import hjs.mall.controller.dto.BasicResponse;
-import hjs.mall.controller.dto.OrderItemDto;
-import hjs.mall.controller.dto.OrderItemsResponseDto;
-import hjs.mall.controller.dto.OrderResponseDto;
+import hjs.mall.controller.dto.*;
 import hjs.mall.domain.*;
 import hjs.mall.repository.ItemRepository;
 import hjs.mall.repository.MemberJpaRepository;
 import hjs.mall.repository.OrderItemsRepository;
 import hjs.mall.repository.OrderRepository;
 import hjs.mall.service.OrderService;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -45,7 +49,15 @@ public class OrderController {
     }
 
     @PostMapping("/v1/orders")
-    public ResponseEntity<?> createOrder(@RequestBody OrderCreateRequest orderCreateRequest) {
+    public ResponseEntity<?> createOrder(@RequestBody @Validated OrderCreateRequest orderCreateRequest, BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            List<String> errors = bindingResult.getAllErrors()
+                    .stream()
+                    .map(ObjectError::getDefaultMessage)
+                    .toList();
+            return ResponseEntity.badRequest().body(new ErrorDto(errors));
+        }
 
         List<OrderItems> collect = orderCreateRequest.getOrderItem().stream().map(oi -> {
             Optional<Item> byId = itemRepository.findById(oi.getItem_id());
@@ -95,6 +107,7 @@ public class OrderController {
 
     @Data
     static class OrderCreateRequest {
+        @NotNull(message = "member id is required")
         Long member_id;
         Address address;
         List<OrderItemDto> orderItem;
