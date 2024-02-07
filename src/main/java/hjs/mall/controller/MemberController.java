@@ -1,9 +1,13 @@
 package hjs.mall.controller;
 
 import hjs.mall.controller.dto.*;
+import hjs.mall.domain.Basket;
 import hjs.mall.domain.Member;
+import hjs.mall.exception.DataNotExistException;
+import hjs.mall.repository.BasketRepository;
 import hjs.mall.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,11 +17,13 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberService memberService;
+    private final BasketRepository basketRepository;
 
     @PostMapping("/v1/members/register")
     public ResponseEntity<?> createMember(@RequestBody @Validated CreateMemberDto createMemberDto, BindingResult bindingResult) {
@@ -71,5 +77,28 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.OK).body(basicResponse);
     }
 
+    @GetMapping("/v1/members/basket")
+    public ResponseEntity<?> getBasket(@RequestBody BasketRequestDto basketRequestDto) {
+        Basket basket = basketRepository
+                .findByMemberId(basketRequestDto.getMember_id())
+                .orElseThrow(() -> new DataNotExistException("member does not exist"));
+        BasketResponseDto basketResponseDto = new BasketResponseDto(basket);
 
+        BasicResponse basicResponse = new BasicResponse("success", basketResponseDto, "");
+        return ResponseEntity.status(HttpStatus.OK).body(basicResponse);
+    }
+
+    @Data
+    static class BasketRequestDto {
+        private String member_id;
+    }
+
+    @Data
+    static class BasketResponseDto{
+        private Long basket_id;
+
+        public BasketResponseDto(Basket basket) {
+            this.basket_id = basket.getId();
+        }
+    }
 }
