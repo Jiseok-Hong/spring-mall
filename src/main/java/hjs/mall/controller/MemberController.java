@@ -3,6 +3,7 @@ package hjs.mall.controller;
 import hjs.mall.controller.dto.*;
 import hjs.mall.domain.Basket;
 import hjs.mall.domain.Member;
+import hjs.mall.domain.OrderItems;
 import hjs.mall.exception.DataNotExistException;
 import hjs.mall.repository.BasketRepository;
 import hjs.mall.service.MemberService;
@@ -96,9 +97,28 @@ public class MemberController {
     @Data
     static class BasketResponseDto{
         private Long basket_id;
+        private List<OrderItemDto> orderItems;
 
         public BasketResponseDto(Basket basket) {
             this.basket_id = basket.getId();
+            this.orderItems = basket.getOrderItems().stream()
+                    .map(OrderItemDto::new)
+                    .toList();
         }
     }
+
+    @Data
+    static class OrderItemDto {
+        private int count;
+        private int orderPrice;
+        private String item_name;
+
+        public OrderItemDto(OrderItems orderItems) {
+            this.count = orderItems.getCount();
+            this.orderPrice = orderItems.getOrderPrice();
+            this.item_name = orderItems.getItem().getName();
+        }
+
+    }
+
 }

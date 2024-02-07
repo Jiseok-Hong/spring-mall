@@ -15,9 +15,13 @@ public class BasketRepository {
     private final EntityManager em;
 
     public Optional<Basket> findByMemberId(String member_id) {
-        List<Basket> basket = em.createQuery("select b from Basket b where b.member.id = :member_id", Basket.class)
+        List<Basket> basket = em.createQuery("select b from Basket b" +
+                        " join fetch b.orderItems oi" +
+                        " join fetch oi.item i" +
+                        " where b.member.id = :member_id", Basket.class)
                 .setParameter("member_id", member_id)
                 .getResultList();
+
         return basket.stream().findFirst();
     }
 

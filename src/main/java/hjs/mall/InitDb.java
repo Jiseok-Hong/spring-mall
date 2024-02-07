@@ -56,15 +56,19 @@ public class InitDb {
                     .build();
             em.persist(item2);
 
+            Member member = memberService.findAllMember().get(0);
+
             OrderItems orderItems1 = OrderItems.builder()
                     .item(item1)
                     .count(3)
+                    .basket(member.getBasket())
                     .orderPrice(100)
                     .build();
 
             OrderItems orderItems2 = OrderItems.builder()
                     .item(item2)
                     .count(2)
+                    .basket(member.getBasket())
                     .orderPrice(200)
                     .build();
 
