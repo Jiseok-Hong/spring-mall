@@ -3,8 +3,11 @@ package hjs.mall.service;
 import hjs.mall.controller.dto.CreateMemberDto;
 import hjs.mall.controller.dto.LoginMemberDto;
 import hjs.mall.controller.dto.LoginMemberResponse;
+import hjs.mall.controller.dto.MemberStatsResponse;
 import hjs.mall.domain.Basket;
 import hjs.mall.domain.Member;
+import hjs.mall.domain.Orders;
+import hjs.mall.exception.DataNotExistException;
 import hjs.mall.exception.DuplicatedMemberIdException;
 import hjs.mall.repository.MemberJpaRepository;
 import hjs.mall.repository.MemberRepository;
@@ -83,6 +86,18 @@ public class MemberService {
                 .accessToken(jwtProvider.createAccessToken(member.getUserId(), member.getRole()))
                 .refreshToken(refreshToken)
                 .build();
+    }
+
+    public MemberStatsResponse getMemberAllStats(Long member_id) {
+        Member member = memberRepository.findByIdWithOrdersAndOrderItems(member_id)
+                .orElseThrow(() -> new DataNotExistException("Member not Existed"));
+
+        int sum = member.getOrders().stream().mapToInt(Orders::getTotalPrice).sum();
+        int orderCount = member.getOrders().size();
+        int itemCount = member.getOrders().stream().mapToInt(o -> o.getOrderItems().size()).sum();
+
+        return new MemberStatsResponse(member.getUserName(), sum, orderCount, itemCount);
+
     }
 
     @Transactional

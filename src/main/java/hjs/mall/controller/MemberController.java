@@ -89,9 +89,23 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.OK).body(basicResponse);
     }
 
+    @GetMapping("/v1/members/stats")
+    public ResponseEntity<?> getMemberOrderStats(@RequestBody MemberRequestDto basketRequestDto) {
+
+        MemberStatsResponse memberAllStats = memberService.getMemberAllStats(basketRequestDto.member_id);
+
+        BasicResponse basicResponse = new BasicResponse("success", memberAllStats, "");
+        return ResponseEntity.status(HttpStatus.OK).body(basicResponse);
+    }
+
     @Data
     static class BasketRequestDto {
         private String member_id;
+    }
+
+    @Data
+    static class MemberRequestDto {
+        private Long member_id;
     }
 
     @Data

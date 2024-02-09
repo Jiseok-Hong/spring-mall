@@ -27,6 +27,16 @@ public class MemberJpaRepository implements MemberRepository {
         return em.find(Member.class, id);
     }
 
+    public Optional<Member> findByIdWithOrdersAndOrderItems(Long id) {
+        List<Member> members = em.createQuery("select m from Member m" +
+                        " join fetch m.orders o" +
+                        " where m.id = :member_id", Member.class)
+                .setParameter("member_id", id)
+                .getResultList();
+
+        return members.stream().findFirst();
+    }
+
     public Optional<Member> findByUserId(String userId) {
         List<Member> members = em.createQuery("select m from Member m where m.userId = :userId", Member.class)
                 .setParameter("userId", userId)
