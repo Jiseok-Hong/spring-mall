@@ -21,7 +21,6 @@ public class BasketRepository {
                         " where b.member.id = :member_id", Basket.class)
                 .setParameter("member_id", member_id)
                 .getResultList();
-
         return basket.stream().findFirst();
     }
 
