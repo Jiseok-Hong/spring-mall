@@ -102,13 +102,9 @@ public class SecurityConfig {
                                 response.setCharacterEncoding("utf-8");
                                 response.setContentType("text/html; charset=UTF-8");
                                 response.getWriter().write(authException.getMessage());
-                            } else {
-                                response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                                response.setCharacterEncoding("utf-8");
-                                response.setContentType("text/html; charset=UTF-8");
-                                response.getWriter().write("Unauthenticated");
                             }
                         })
+
                 );
 
 
