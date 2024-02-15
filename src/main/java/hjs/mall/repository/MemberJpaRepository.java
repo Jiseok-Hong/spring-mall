@@ -14,7 +14,7 @@ import java.util.Optional;
 @Repository
 @Slf4j
 @RequiredArgsConstructor
-public class MemberJpaRepository implements MemberRepository {
+public class MemberJpaRepository {
 
     private final EntityManager em;
 
