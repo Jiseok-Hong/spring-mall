@@ -44,6 +44,11 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("update Member m set m.age = m.age + 1 where m.age >= :age")
     int bulkAgeUpdate(@Param("age") int age);
 
+    @Query("select distinct m from Member m " +
+            "join fetch m.orders o " +
+            "join fetch o.orderItems oi " +
+            "where m.id = :memberId")
+    Optional<Member> findByIdWithOrdersAndOrderItems(@Param("memberId") Long id);
 
     @Query("select m from Member m join fetch m.team") //->@Override @EntityGraph(attributePaths = {"team"})
     List<Member> findMemberFetchJoin();
