@@ -88,6 +88,12 @@ public class MemberService {
                 .build();
     }
 
+    @Transactional
+    public void logout(Long member_id) {
+        Member member = memberRepository.findById(member_id);
+        member.clearRefreshToken();
+    }
+
     public MemberStatsResponse getMemberAllStats(Long member_id) {
         Member member = memberRepository.findByIdWithOrdersAndOrderItems(member_id)
                 .orElseThrow(() -> new DataNotExistException("Member not Existed"));

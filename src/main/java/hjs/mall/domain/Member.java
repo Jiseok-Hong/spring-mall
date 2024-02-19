@@ -45,4 +45,8 @@ public class Member extends BaseTimeEntity{
         this.basket = basket;
         basket.setMember(this);
     }
+
+    public void clearRefreshToken() {
+        this.refreshToken = null;
+    }
 }

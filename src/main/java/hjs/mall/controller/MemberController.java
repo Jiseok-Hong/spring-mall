@@ -98,6 +98,15 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.OK).body(basicResponse);
     }
 
+    @PostMapping("/v1/members/logout")
+    public ResponseEntity<?> logoutMember(@RequestBody MemberRequestDto memberRequestDto) {
+
+        memberService.logout(memberRequestDto.member_id);
+
+        BasicResponse basicResponse = new BasicResponse("success", null, "");
+        return ResponseEntity.status(HttpStatus.OK).body(basicResponse);
+    }
+
     @Data
     static class BasketRequestDto {
         private String member_id;
