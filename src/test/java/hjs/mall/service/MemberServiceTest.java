@@ -8,14 +8,11 @@ import hjs.mall.domain.Role;
 import hjs.mall.exception.DuplicatedMemberIdException;
 import hjs.mall.repository.MemberJpaRepository;
 import hjs.mall.security.JwtProvider;
-import jakarta.persistence.EntityManager;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;

@@ -10,7 +10,6 @@ import hjs.mall.domain.Orders;
 import hjs.mall.exception.DataNotExistException;
 import hjs.mall.exception.DuplicatedMemberIdException;
 import hjs.mall.repository.MemberJpaRepository;
-import hjs.mall.repository.MemberRepository;
 import hjs.mall.security.CustomUserDetail;
 import hjs.mall.security.JwtProvider;
 import lombok.AllArgsConstructor;
