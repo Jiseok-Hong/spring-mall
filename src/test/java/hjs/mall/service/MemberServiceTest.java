@@ -38,8 +38,8 @@ class MemberServiceTest {
     @BeforeEach
     public void createInitialMember() {
         CreateMemberDto createMemberDto = new CreateMemberDto();
-        createMemberDto.setUserName("john");
-        createMemberDto.setUserId("john");
+        createMemberDto.setUserName("john1");
+        createMemberDto.setUserId("john1");
         createMemberDto.setRole(Role.ADMIN);
         createMemberDto.setPassword("1234");
 
@@ -48,13 +48,12 @@ class MemberServiceTest {
     }
 
     @Test
-    public void register() throws Exception{
+    public void register() throws Exception {
         // given
         // register member executed in before each
-
         // then
-        Optional<Member> findMember = memberRepository.findByUserId("john");
-        findMember.ifPresent(member -> assertThat(member.getUserName()).isEqualTo("john"));
+        Optional<Member> findMember = memberRepository.findByUserId("john1");
+        findMember.ifPresent(member -> assertThat(member.getUserName()).isEqualTo("john1"));
     }
 
     @Test
@@ -64,15 +63,15 @@ class MemberServiceTest {
 
         // when
         LoginMemberDto loginMemberDto = new LoginMemberDto();
-        loginMemberDto.setUserId("john");
+        loginMemberDto.setUserId("john1");
         loginMemberDto.setPassword("1234");
 
         LoginMemberDto wrongUserId = new LoginMemberDto();
-        wrongUserId.setUserId("john1");
+        wrongUserId.setUserId("john2");
         wrongUserId.setPassword("1234");
 
         LoginMemberDto wrongPassword = new LoginMemberDto();
-        wrongUserId.setUserId("john");
+        wrongUserId.setUserId("joh2");
         wrongUserId.setPassword("123");
 
         // then
@@ -85,7 +84,7 @@ class MemberServiceTest {
         LoginMemberResponse login = memberService.login(loginMemberDto);
         assertThat(jwtProvider.validateToken("BEARER " + login.getAccessToken(), true))
                 .isTrue();
-        assertThat(jwtProvider.validateToken("BEARER " +login.getRefreshToken(), false))
+        assertThat(jwtProvider.validateToken("BEARER " + login.getRefreshToken(), false))
                 .isTrue();
 
 
@@ -98,26 +97,26 @@ class MemberServiceTest {
 
         //then
         CreateMemberDto duplicatedMemberDto = new CreateMemberDto();
-        duplicatedMemberDto.setUserName("john");
-        duplicatedMemberDto.setUserId("john");
+        duplicatedMemberDto.setUserName("john1");
+        duplicatedMemberDto.setUserId("john1");
         duplicatedMemberDto.setPassword("1234");
 
         assertThatThrownBy(() -> memberService.join(duplicatedMemberDto))
                 .isInstanceOf(DuplicatedMemberIdException.class);
     }
-    
+
     @Test
     public void checkRTR() throws Exception {
         // given
         LoginMemberDto loginMemberDto = new LoginMemberDto();
-        loginMemberDto.setUserId("john");
+        loginMemberDto.setUserId("john1");
         loginMemberDto.setPassword("1234");
 
         // when
         LoginMemberResponse login = memberService.login(loginMemberDto);
 
         String oldAccessToken = "BEARER " + login.getAccessToken();
-        String oldRefreshToken = "BEARER " +login.getRefreshToken();
+        String oldRefreshToken = "BEARER " + login.getRefreshToken();
 
         assertThat(jwtProvider.validateToken(oldAccessToken, true))
                 .isTrue();
@@ -141,4 +140,22 @@ class MemberServiceTest {
 
     }
 
+    @Test
+    public void logout() throws Exception {
+        // given
+        LoginMemberDto loginMemberDto = new LoginMemberDto();
+        loginMemberDto.setUserId("john1");
+        loginMemberDto.setPassword("1234");
+
+        LoginMemberResponse login = memberService.login(loginMemberDto);
+
+        Member member = memberRepository.findByUserId(login.getUserId()).get();
+        // when
+
+        assertThat(login.getRefreshToken()).isEqualTo(member.getRefreshToken());
+        // then
+        memberService.logout(member.getId());
+
+        assertThat(member.getRefreshToken()).isEqualTo(null);
+    }
 }
