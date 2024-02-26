@@ -30,6 +30,10 @@ public class Orders {
     @OneToMany(mappedBy = "orders", cascade = CascadeType.ALL)
     private List<OrderItems> orderItems = new ArrayList<>();
 
+    @OneToOne(fetch = LAZY)
+    @JoinColumn(name="promotion_code_id")
+    private PromotionCodes promotionCodes;
+
     @Embedded
     private Address address;
 
