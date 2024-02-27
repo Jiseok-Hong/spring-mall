@@ -42,6 +42,10 @@ public class Orders {
 
     private LocalDateTime orderDate;
 
+    public void setPromotionCodes(PromotionCodes promotionCodes) {
+        this.promotionCodes = promotionCodes;
+    }
+
     public void setMember(Member member) {
         member.getOrders().add(this);
         this.member = member;
@@ -53,6 +57,9 @@ public class Orders {
     }
 
     public int getTotalPrice() {
-        return orderItems.stream().mapToInt(OrderItems::getTotalPrice).sum();
+        return orderItems
+                .stream()
+                .mapToInt(OrderItems::getTotalPrice)
+                .sum() * promotionCodes.getDiscountRate() / 100;
     }
 }

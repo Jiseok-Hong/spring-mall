@@ -2,6 +2,7 @@ package hjs.mall.service;
 
 import hjs.mall.controller.dto.OrderItemDto;
 import hjs.mall.domain.*;
+import hjs.mall.exception.DataNotExistException;
 import hjs.mall.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,8 @@ public class OrderService {
 
     private final OrderItemsRepository orderItemsRepository;
     private final OrderRepository orderRepository;
-    public void createOrderWithItems(Member member, Address address, List<OrderItems> orderItemDtoList) {
+    private final PromotionCodesRepository promotionCodesRepository;
+    public void createOrderWithItems(Member member, Address address, String promotionCode, List<OrderItems> orderItemDtoList) {
 
 
         Orders order = Orders.builder()
@@ -27,6 +29,11 @@ public class OrderService {
                 .orderStatus(OrderStatus.PENDING)
                 .orderDate(LocalDateTime.now())
                 .build();
+
+        PromotionCodes byPromotionCode = promotionCodesRepository.findByPromotionCode(promotionCode)
+                .orElseThrow(() -> new DataNotExistException("Promotion Code is not existed"));
+
+        order.setPromotionCodes(byPromotionCode);
 
         for (OrderItems orderItem : orderItemDtoList) {
             order.setOrderItems(orderItem);

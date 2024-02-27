@@ -2,10 +2,7 @@ package hjs.mall.controller;
 
 import hjs.mall.controller.dto.*;
 import hjs.mall.domain.*;
-import hjs.mall.repository.ItemRepository;
-import hjs.mall.repository.MemberJpaRepository;
-import hjs.mall.repository.OrderItemsRepository;
-import hjs.mall.repository.OrderRepository;
+import hjs.mall.repository.*;
 import hjs.mall.service.OrderService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -71,6 +68,7 @@ public class OrderController {
         orderService.createOrderWithItems(
                         memberJpaRepository.findById(orderCreateRequest.member_id),
                         orderCreateRequest.address,
+                        orderCreateRequest.getPromotionCode(),
                         collect);
 
         BasicResponse basicResponse = new BasicResponse("success", null, "Order Created");
@@ -110,6 +108,7 @@ public class OrderController {
         @NotNull(message = "member id is required")
         Long member_id;
         Address address;
+        String promotionCode;
         List<OrderItemDto> orderItem;
     }
 

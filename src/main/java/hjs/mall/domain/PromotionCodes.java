@@ -1,18 +1,21 @@
 package hjs.mall.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import java.time.LocalDate;
+import jakarta.persistence.*;
+import lombok.*;
 
+import java.time.LocalDate;
+@Entity
+@Getter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class PromotionCodes {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "promotion_code_id")
     private Long id;
 
+    @Column(unique = true)
     private String promotionCode;
     private int discountRate;
-    private LocalDate expiryDate;
 }
